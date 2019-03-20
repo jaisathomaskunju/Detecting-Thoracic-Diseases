@@ -1,0 +1,43 @@
+import xml.etree.cElementTree as ET
+import os
+import cv2
+
+folder_path = 'images'
+for n, file in enumerate(os.scandir(folder_path)):
+    tree = ET.parse(file.path)
+    root = tree.getroot()
+    img_folder = root[0].text
+    img = root[1].text
+    path = os.path.join(img_folder, img)
+    print(path)
+
+#tree = ET.ElementTree(file='F:\\box\\annotations\\1.xml')
+#tree.getroot()
+#root = tree.getroot()
+#print(root.tag)
+
+cod = []
+a = cv2.imread(path)
+for item in root.findall('object'):
+    for child in item:
+        if child.tag == 'bndbox':
+            for i in child:
+                cod.append(int(i.text))
+print(cod)
+n = len(cod)
+sl = slice(0, n, 4)
+x = len(cod[sl])
+print(x)
+n0 = 0
+
+for i in range(0, x):
+    for j in cod:
+        x1 = cod[n0 + 0]
+        x2 = cod[n0 + 2]
+        y1 = cod[n0 + 1]
+        y2 = cod[n0 + 3]
+    print(x1, y1, x2, y2)
+    cv2.rectangle(a, (x1, y1), (x2, y2), (255, 0, 0), 3)
+    n0 = n0 + 4
+cv2.imshow('color image', a)
+k = cv2.waitKey(0)
